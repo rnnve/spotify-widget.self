@@ -1,10 +1,6 @@
 # Spotify Widget
 
-> **Vibe coded by AI** — this project was built entirely through natural language conversations with an AI coding agent.
-
 An OBS-ready widget that displays your currently playing Spotify track. Uses the Spotify Web API to fetch your real-time listening status and renders a clean overlay perfect for streaming.
-
-> This project is designed for **personal use only** — it uses a single Spotify refresh token tied to your account. Feel free to [fork it](https://github.com/cltq/spotify-widget.self) and make it your own.
 
 ## Features
 
@@ -14,19 +10,52 @@ An OBS-ready widget that displays your currently playing Spotify track. Uses the
 - Auto-refreshes every 5 seconds
 - Transparent background by default (OBS-ready)
 - Customizable via URL query parameters
-- Only detects **your** account (uses OAuth refresh token)
+- Self-hostable via Docker
 
 ## Setup
 
 1. Create an app at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Add `http://localhost:3000/api/auth/callback` (and/or your Vercel URL) as a Redirect URI
-3. Copy `.env.example` to `.env.local` and fill in `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, and `SPOTIFY_REDIRECT_URI`
-4. Visit `/api/auth` to authorize → copy the displayed refresh token into `.env.local` as `SPOTIFY_REFRESH_TOKEN`
+2. Add your deployment URL as a Redirect URI (e.g. `http://localhost:3000/api/auth/callback`)
+3. Copy `.env.example` to `.env.local` and fill in your credentials
+4. Start the dev server, visit `/api/auth` to authorize, then paste the refresh token into `.env.local`
+5. Restart the server
+
+## Self-Hosting
+
+### Docker
+
+```bash
+docker build -t spotify-widget .
+docker run -p 3000:3000 \
+  -e SPOTIFY_CLIENT_ID=your_id \
+  -e SPOTIFY_CLIENT_SECRET=your_secret \
+  -e SPOTIFY_REDIRECT_URI=http://your-domain:3000/api/auth/callback \
+  -e SPOTIFY_REFRESH_TOKEN=your_token \
+  spotify-widget
+```
+
+### Docker Compose
+
+```yaml
+services:
+  spotify-widget:
+    image: ghcr.io/rnnve/spotify-widget.self:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - SPOTIFY_CLIENT_ID=your_id
+      - SPOTIFY_CLIENT_SECRET=your_secret
+      - SPOTIFY_REDIRECT_URI=http://your-domain:3000/api/auth/callback
+      - SPOTIFY_REFRESH_TOKEN=your_token
+    restart: unless-stopped
+```
+
+A pre-built image is available on [GitHub Container Registry](https://github.com/rnnve/spotify-widget.self/pkgs/container/spotify-widget.self).
 
 ## OBS Integration
 
 Add a **Browser Source** in OBS with:
-- URL: `http://localhost:3000/widget` (or your Vercel URL)
+- URL: `http://localhost:3000/widget` (or your deployment URL)
 - Width: 400, Height: 120
 - Enable "Refresh browser when scene becomes active"
 
