@@ -1,0 +1,12 @@
+services:
+  spotify-widget:
+    image: ghcr.io/rnnve/spotify-widget.self:latest
+    container_name: spotify-widget
+    ports:
+      - "3000:3000"
+    environment:
+      - SPOTIFY_CLIENT_ID=your_client_id
+      - SPOTIFY_CLIENT_SECRET=your_client_secret
+      - SPOTIFY_REDIRECT_URI=http://localhost:3000/api/auth/callback
+      - SPOTIFY_REFRESH_TOKEN=your_refresh_token
+    restart: unless-stopped
