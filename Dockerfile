@@ -1,20 +1,15 @@
-FROM node:20-alpine AS base
-RUN apk add --no-cache curl
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:${PATH}"
-
-FROM base AS deps
+FROM oven/bun:1 AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-FROM base AS builder
+FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run build
 
-FROM base AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
