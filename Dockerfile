@@ -1,9 +1,11 @@
 FROM node:20-alpine AS base
+RUN apk add --no-cache curl
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
 
 FROM base AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN corepack enable && corepack prepare bun@latest --activate
 RUN bun install --frozen-lockfile
 
 FROM base AS builder
